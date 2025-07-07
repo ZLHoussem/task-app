@@ -3,12 +3,18 @@
 import { trpc } from '@/utils/trpc';
 import { useState } from 'react';
 
+type Task = {
+  id: string;
+  title: string;
+  description: string | null;
+};
+
 export default function HomePage() {
   const utils = trpc.useUtils();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
 
-  const [editId, setEditId] = useState<number | null>(null);
+  const [editId, setEditId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
   const [editDescription, setEditDescription] = useState('');
 
@@ -38,7 +44,7 @@ export default function HomePage() {
     addTask.mutate({ title, description });
   };
 
-  const handleEdit = (task: any) => {
+  const handleEdit = (task: Task) => {
     setEditId(task.id);
     setEditTitle(task.title);
     setEditDescription(task.description || '');
@@ -46,7 +52,9 @@ export default function HomePage() {
 
   const handleUpdate = (e: React.FormEvent) => {
     e.preventDefault();
-    updateTask.mutate({ id: String(editId), title: editTitle, description: editDescription });
+    if (editId) {
+      updateTask.mutate({ id: editId, title: editTitle, description: editDescription });
+    }
   };
 
   return (
